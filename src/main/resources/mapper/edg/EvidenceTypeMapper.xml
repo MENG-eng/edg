@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzdl.edg.mapper.EvidenceTypeMapper">
+
+    <resultMap type="com.hzdl.edg.domain.EvidenceType" id="EvidenceTypeResult">
+        <result property="id"    column="id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="ancestors"    column="ancestors"  />
+        <result property="code"    column="code"    />
+        <result property="name"    column="name"    />
+        <result property="icon"    column="icon"    />
+        <result property="enable"    column="enable"    />
+        <result property="sort"    column="sort"    />
+        <result property="description"    column="description"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectEvidenceTypeVo">
+        select id, dept_id, parent_id, ancestors, code, name, icon, enable, sort, `description`, del_flag, create_by, create_time, update_by, update_time from edg_evidence_type
+    </sql>
+
+    <select id="selectIds" resultType="java.lang.Long">
+        select
+            id
+        from
+            edg_evidence_type
+        where
+            del_flag=0
+    </select>
+
+    <select id="selectAncestorsById" resultType="java.lang.String">
+        SELECT
+            ancestors
+        FROM
+            edg_evidence_type
+        where
+            id=#{id}
+            and del_flag=0
+    </select>
+
+    <select id="selectIdNameAndAncestors" resultMap="EvidenceTypeResult">
+        SELECT
+            edg_evidence_type.id,
+            edg_evidence_type.dept_id,
+            edg_evidence_type.parent_id,
+            edg_evidence_type.ancestors,
+            edg_evidence_type.`name`
+        FROM
+            edg_evidence_type
+        where
+            del_flag=0
+    </select>
+
+    <select id="selectEvidenceTypeList" parameterType="com.hzdl.edg.domain.EvidenceType" resultMap="EvidenceTypeResult">
+        <include refid="selectEvidenceTypeVo"/>
+        <where>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="enable != null  and enable != ''"> and enable = #{enable}</if>
+            and del_flag = 0
+        </where>
+    </select>
+
+    <select id="selectEvidenceTypeById" parameterType="Long" resultMap="EvidenceTypeResult">
+        <include refid="selectEvidenceTypeVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertEvidenceType" parameterType="com.hzdl.edg.domain.EvidenceType" useGeneratedKeys="true" keyProperty="id">
+        insert into edg_evidence_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">dept_id,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="ancestors != null">ancestors,</if>
+            <if test="code != null">code,</if>
+            <if test="name != null">name,</if>
+            <if test="icon != null">icon,</if>
+            <if test="enable != null">enable,</if>
+            <if test="sort != null">sort,</if>
+            <if test="description != null">`description`,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">#{deptId},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="ancestors != null">#{ancestors},</if>
+            <if test="code != null">#{code},</if>
+            <if test="name != null">#{name},</if>
+            <if test="icon != null">#{icon},</if>
+            <if test="enable != null">#{enable},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="description != null">#{description},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEvidenceType" parameterType="com.hzdl.edg.domain.EvidenceType">
+        update edg_evidence_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="ancestors != null">ancestors = #{ancestors},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="enable != null">enable = #{enable},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEvidenceTypeById" parameterType="Long">
+        update edg_evidence_type set del_flag = 1 where id = #{id}
+    </delete>
+
+    <delete id="deleteEvidenceTypeByIds" parameterType="String">
+        update edg_evidence_type set del_flag = 1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

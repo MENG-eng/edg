@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzdl.edg.mapper.EvidenceNodeMapper">
+
+    <resultMap type="com.hzdl.edg.domain.EvidenceNode" id="EvidenceNodeResult">
+        <result property="id"    column="id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="ancestors"    column="ancestors"    />
+        <result property="evidenceId"    column="evidence_id"    />
+        <result property="evidenceStatus"    column="evidence_status"    />
+        <result property="optType"    column="opt_type"    />
+        <result property="description"    column="description"    />
+        <result property="totalSize"    column="total_size"    />
+        <result property="version"    column="version"    />
+        <result property="keyId"    column="key_id"    />
+        <result property="fileHash"    column="file_hash"    />
+        <result property="attachmentTotalHash"    column="attachment_total_hash"    />
+        <result property="blockHash"    column="block_hash"    />
+        <result property="blockHeight"    column="block_height"    />
+        <result property="txid"    column="txid"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="operatorName"    column="operator_name"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectEvidenceNode">
+        select id, dept_id, dept_name, parent_id, ancestors, evidence_id, evidence_status, opt_type, description, total_size, version, key_id, file_hash, attachment_total_hash, block_hash, block_height, txid,operator_id, operator_name, del_flag, create_by, create_time, update_by, update_time from edg_evidence_node
+    </sql>
+
+    <select id="selectEvidenceNodeList" parameterType="com.hzdl.edg.domain.EvidenceNode" resultMap="EvidenceNodeResult">
+        <include refid="selectEvidenceNode"/>
+        <where>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="deptName != null "> and dept_name = #{deptName}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="ancestors != null  and ancestors != ''"> and ancestors = #{ancestors}</if>
+            <if test="evidenceId != null "> and evidence_id = #{evidenceId}</if>
+            <if test="evidenceStatus != null  and evidenceStatus != ''"> and evidence_status = #{evidenceStatus}</if>
+            <if test="optType != null  and optType != ''"> and opt_type = #{optType}</if>
+            <if test="totalSize != null "> and total_size = #{totalSize}</if>
+            <if test="version != null  and version != ''"> and version = #{version}</if>
+            <if test="keyId != null  and keyId != ''"> and key_id = #{keyId}</if>
+            <if test="fileHash != null  and fileHash != ''"> and file_hash = #{fileHash}</if>
+            <if test="blockHash != null  and blockHash != ''"> and block_hash = #{blockHash}</if>
+            <if test="blockHeight != null "> and block_height = #{blockHeight}</if>
+            <if test="txid != null "> and txid = #{txid}</if>
+            <if test="operatorId != null  and operatorId != ''"> and operator_id = #{operatorId}</if>
+            <if test="operatorName != null  and operatorName != ''"> and operator_name = #{operatorName}</if>
+            and del_flag = 0
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectEvidenceNodeVOList" resultType="com.hzdl.edg.domain.vo.EvidenceNodeVO">
+        select e.file_name fileName,
+            e.evidence_type_name evidenceTypeName,
+            en.id nodeId,
+            en.evidence_id evidenceId,
+            en.opt_type optType,
+            en.description,
+            en.total_size totalSize,
+            en.version,
+            en.operator_name operator,
+            en.create_time evidenceNodeCreateTime
+        from edg_evidence_node en
+        left join edg_evidence e
+        on en.evidence_id = e.id
+        <where>
+            <if test="deptId != null "> and en.dept_id = #{deptId}</if>
+            <if test="deptName != null "> and en.dept_name = #{deptName}</if>
+            <if test="parentId != null "> and en.parent_id = #{parentId}</if>
+            <if test="ancestors != null  and ancestors != ''"> and en.ancestors = #{ancestors}</if>
+            <if test="evidenceId != null "> and en.evidence_id = #{evidenceId}</if>
+            <if test="evidenceStatus != null  and evidenceStatus != ''"> and en.evidence_status = #{evidenceStatus}</if>
+            <if test="optType != null  and optType != ''"> and en.opt_type = #{optType}</if>
+            <if test="totalSize != null "> and en.total_size = #{totalSize}</if>
+            <if test="version != null  and version != ''"> and en.version = #{version}</if>
+            <if test="keyId != null  and keyId != ''"> and en.key_id = #{keyId}</if>
+            <if test="fileHash != null  and fileHash != ''"> and en.file_hash = #{fileHash}</if>
+            <if test="blockHash != null  and blockHash != ''"> and en.block_hash = #{blockHash}</if>
+            <if test="blockHeight != null "> and en.block_height = #{blockHeight}</if>
+            <if test="txid != null "> and en.txid = #{txid}</if>
+            <if test="operatorId != null  and operatorId != ''"> and en.operator_id = #{operatorId}</if>
+            <if test="operatorName != null  and operatorName != ''"> and en.operator_name = #{operatorName}</if>
+            and en.del_flag = 0 and e.del_flag = 0
+        </where>
+        order by en.create_time desc
+    </select>
+
+    <select id="selectEvidenceNodeById" parameterType="Long" resultMap="EvidenceNodeResult">
+        <include refid="selectEvidenceNode"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByAncestors" parameterType="String" resultMap="EvidenceNodeResult">
+        <include refid="selectEvidenceNode"/>
+        where id in (${ancestors})
+    </select>
+
+    <select id="optTypeStatistics" resultType="com.hzdl.edg.domain.vo.OptTypeStatisticsVO">
+        select
+            sum(case when opt_type = 'CREATE' then 1 else 0 end) createCount,
+            sum(case when opt_type = 'COPY' then 1 else 0 end) copyCount,
+            sum(case when opt_type = 'ADD' then 1 else 0 end) addCount,
+            sum(case when opt_type = 'MODIFY' then 1 else 0 end) modifyCount
+        from edg_evidence_node
+        <where>
+            <if test="deptId != null"> and dept_id = #{deptId} </if>
+            and del_flag = 0
+        </where>
+    </select>
+
+    <select id="quoteStatistics" resultType="com.hzdl.edg.domain.vo.StatisticsVO">
+        select d.dept_name name, count(en.id) cnt
+        from edg_evidence e
+        left join edg_evidence_node en
+        on e.id = en.evidence_id
+        left join sys_dept d
+        on d.dept_id = en.dept_id and en.del_flag = 0
+        <where>
+            <if test="deptId != null"> and e.dept_id = #{deptId}</if>
+            and e.del_flag = 0
+        </where>
+        group by en.dept_id, d.dept_name
+    </select>
+
+    <select id="quoteTop10PersonalStatistics" resultType="com.hzdl.edg.domain.vo.StatisticsVO">
+        select e.file_name name, e.heat cnt
+        from edg_evidence e
+        <where>
+            <if test="deptId != null">e.dept_id = #{deptId}</if>
+            and e.del_flag = 0
+        </where>
+        order by cnt desc
+        limit 10
+    </select>
+
+    <select id="quoteTop10AllStatistics" resultType="com.hzdl.edg.domain.vo.StatisticsVO">
+        select e.file_name name, e.heat cnt
+        from edg_evidence e
+        where e.del_flag = 0
+        order by cnt desc
+        limit 10
+    </select>
+
+    <select id="selectByEvidenceId" resultMap="EvidenceNodeResult">
+        <include refid="selectEvidenceNode"/>
+        where evidence_id = #{evidenceId} and del_flag = 0
+    </select>
+
+    <select id="selectByEvidenceIdWithoutCopyLeafNode" resultMap="EvidenceNodeResult">
+        SELECT c.*
+        FROM edg_evidence_node c
+        WHERE c.evidence_id = #{evidenceId}
+        AND c.del_flag = 0
+        AND NOT EXISTS (
+            SELECT *
+            FROM
+                (
+                    SELECT a.id
+                    FROM edg_evidence_node a
+                    WHERE a.evidence_id = #{evidenceId}
+                    AND a.opt_type = 'COPY'
+                    AND (
+                        SELECT count(*)
+                        FROM edg_evidence_node e
+                        WHERE e.parent_id = a.id
+                        AND e.evidence_id = #{evidenceId}
+                        AND a.opt_type = 'COPY'
+                    ) = 0
+                ) z
+            WHERE z.id = c.id
+        )
+    </select>
+
+    <insert id="insertEvidenceNode" parameterType="com.hzdl.edg.domain.EvidenceNode" useGeneratedKeys="true" keyProperty="id">
+        insert into edg_evidence_node
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">dept_id,</if>
+            <if test="deptName != null">dept_name,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="ancestors != null">ancestors,</if>
+            <if test="evidenceId != null">evidence_id,</if>
+            <if test="evidenceStatus != null">evidence_status,</if>
+            <if test="optType != null">opt_type,</if>
+            <if test="description != null">description,</if>
+            <if test="totalSize != null">total_size,</if>
+            <if test="version != null">version,</if>
+            <if test="keyId != null">key_id,</if>
+            <if test="fileHash != null">file_hash,</if>
+            <if test="attachmentTotalHash != null">attachment_total_hash,</if>
+            <if test="blockHash != null">block_hash,</if>
+            <if test="blockHeight != null">block_height,</if>
+            <if test="txid != null">txid,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="operatorName != null">operator_name,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">#{deptId},</if>
+            <if test="deptName != null">#{deptName},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="ancestors != null">#{ancestors},</if>
+            <if test="evidenceId != null">#{evidenceId},</if>
+            <if test="evidenceStatus != null">#{evidenceStatus},</if>
+            <if test="optType != null">#{optType},</if>
+            <if test="description != null">#{description},</if>
+            <if test="totalSize != null">#{totalSize},</if>
+            <if test="version != null">#{version},</if>
+            <if test="keyId != null">#{keyId},</if>
+            <if test="fileHash != null">#{fileHash},</if>
+            <if test="attachmentTotalHash != null">#{attachmentTotalHash},</if>
+            <if test="blockHash != null">#{blockHash},</if>
+            <if test="blockHeight != null">#{blockHeight},</if>
+            <if test="txid != null">#{txid},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+            <if test="operatorName != null">#{operatorName},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEvidenceNode" parameterType="com.hzdl.edg.domain.EvidenceNode">
+        update edg_evidence_node
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="deptName != null">dept_name = #{deptName},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="ancestors != null">ancestors = #{ancestors},</if>
+            <if test="evidenceId != null">evidence_id = #{evidenceId},</if>
+            <if test="evidenceStatus != null">evidence_status = #{evidenceStatus},</if>
+            <if test="optType != null">opt_type = #{optType},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="totalSize != null">total_size = #{totalSize},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="keyId != null">key_id = #{keyId},</if>
+            <if test="fileHash != null">file_hash = #{fileHash},</if>
+            <if test="attachmentTotalHash != null">attachment_total_hash = #{attachmentTotalHash},</if>
+            <if test="blockHash != null">block_hash = #{blockHash},</if>
+            <if test="blockHeight != null">block_height = #{blockHeight},</if>
+            <if test="txid != null">txid = #{txid},</if>
+            <if test="operator != null">operator = #{operator},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="deleteEvidenceNodeById" parameterType="Long">
+        update edg_evidence_node set del_flag = 1 where id = #{id}
+    </delete>
+
+    <delete id="deleteEvidenceNodeByIds" parameterType="String">
+        update edg_evidence_node set del_flag = 1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="evidenceNodeExist" parameterType="com.hzdl.edg.domain.EvidenceNode" resultType="java.lang.Boolean">
+        select count(1) > 0  from edg_evidence_node
+        where  del_flag = 0  and dept_id = #{deptId}  and (parent_id = #{parentId} or id = #{parentId} )
+    </select>
+</mapper>

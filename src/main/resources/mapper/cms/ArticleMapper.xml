@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzdl.cms.mapper.ArticleMapper">
+
+    <resultMap type="com.hzdl.cms.domain.Article" id="ArticleResult">
+        <result property="articleId" column="article_id"/>
+        <result property="title" column="title"/>
+        <result property="keywords" column="keywords"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="tagIds" column="tag_ids"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="evidenceId" column="evidence_id"/>
+        <result property="content" column="content"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap type="com.hzdl.cms.vo.ArticleVo" id="ArticleResultVo">
+        <result property="articleId" column="article_id"/>
+        <result property="title" column="title"/>
+        <result property="keywords" column="keywords"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_Name"/>
+        <result property="tagIds" column="tag_ids"/>
+        <result property="tagNames" column="tag_names"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="evidenceId" column="evidence_id"/>
+        <result property="evidenceName" column="file_name"/>
+        <result property="content" column="content"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap type="com.hzdl.api.vo.ArticleNewVo" id="ArticleResultNewVo">
+        <result property="articleId" column="article_id"/>
+        <result property="title" column="title"/>
+        <result property="keywords" column="keywords"/>
+        <result property="categoryName" column="category_Name"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="tagNames" column="tag_names"/>
+        <result property="content" column="content"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="heat" column="heat"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectArticle">
+        select article_id, title, keywords, category_id, tag_ids, dept_id, evidence_id, content, del_flag, view_count, create_by, create_time, update_by, update_time from cms_article
+    </sql>
+    <sql id="selectArticleVo">
+        select a.article_id, a.title, a.keywords, c.category_name, a.tag_ids, d.dept_name,
+        a.evidence_id, e.file_name, a.content, a.del_flag, a.view_count, a.create_by, a.create_time,
+        group_concat(t.tag_name) tag_names from cms_article a
+    </sql>
+    <sql id="selectArticleNewVo">
+        select a.article_id, a.title, a.keywords, c.category_name, a.tag_ids, d.dept_name, a.content, a.view_count, e.heat,
+        a.create_by, a.create_time, group_concat(t.tag_name) tag_names from cms_article a
+    </sql>
+    <sql id="selectArticleDetailNewVo">
+        select a.article_id, a.title, a.keywords, c.category_name, a.tag_ids, d.dept_name, a.content, a.view_count, e.heat,
+        a.create_by, a.create_time, group_concat(t.tag_name) tag_names, a.evidence_id,
+        e.file_name evidence_name, e.evidence_type_name, e.create_time evidence_create_time
+        from cms_article a
+    </sql>
+
+    <select id="selectArticleTypeDept" resultType="com.hzdl.cms.vo.ArticleTypeDeptVo">
+        SELECT
+                d.dept_id id,
+                d.dept_name name,
+                count(a.article_id) countArticle,
+                count(DISTINCT t.id) countType
+        FROM
+                sys_dept d
+                LEFT JOIN cms_article a  ON a.dept_id = d.dept_id and a.del_flag=0
+                LEFT JOIN edg_evidence e ON a.evidence_id = e.id and e.del_flag=0
+                LEFT JOIN edg_evidence_type t ON e.evidence_type = t.id and t.del_flag=0
+        where
+                d.del_flag = 0
+                and d.dept_id != 100
+        GROUP BY
+                d.dept_id
+    </select>
+
+    <select id="selectArticleEvidenceList" resultType="com.hzdl.edg.domain.vo.ArticleEvidenceVo">
+        select a.article_id, a.evidence_id, e.evidence_type evidence_type_id
+        from
+            cms_article a
+            left join edg_evidence e on a.evidence_id = e.id and e.del_flag=0
+        where
+            a.del_flag=0
+    </select>
+
+    <select id="selectArticleList" parameterType="com.hzdl.cms.domain.Article" resultMap="ArticleResult">
+        <include refid="selectArticle"/>
+        <where>
+            <if test="title != null  and title != ''">and title like concat('%', #{title}, '%')</if>
+            <if test="keywords != null  and keywords != ''">and keywords like concat('%', #{keywords}, '%')</if>
+            <if test="categoryId != null ">and category_id = #{categoryId}</if>
+            <if test="tagIds != null  and tagIds != ''">and tag_ids = #{tagIds}</if>
+            <if test="deptId != null ">and dept_id = #{deptId}</if>
+            <if test="evidenceId != null ">and evidence_id like concat('%', #{evidenceId}, '%')</if>
+        </where>
+    </select>
+
+    <!-- 查询文章列表 -->
+    <select id="selectArticleListVo" parameterType="com.hzdl.cms.dto.ArticleDto" resultMap="ArticleResultVo">
+        <include refid="selectArticleVo"/>
+        left join cms_category c on a.category_id = c.category_id
+        left join sys_dept d on d.dept_id = a.dept_id
+        left join edg_evidence e on e.id = a.evidence_id
+        left join cms_tags t on FIND_IN_SET(t.tag_id,a.tag_ids)
+        <where>
+            <if test="title != null and title != ''">and a.title like concat('%', #{title}, '%')</if>
+            <if test="categoryId != null">and a.category_id = #{categoryId}</if>
+            <if test="tagIds != null  and tagIds != ''">and a.tag_ids = #{tagIds}</if>
+            <if test="deptName != null and deptName != ''">and d.dept_name like concat('%', #{deptName}, '%')</if>
+            <if test="evidenceName != null and evidenceName != ''">and e.file_name like concat('%', #{evidenceName}, '%')</if>
+            and a.del_flag = 0
+        </where>
+        group by a.article_id
+        order by a.create_time desc
+    </select>
+
+    <!-- 查询最新文章列表 -->
+    <select id="selectArticleListNewVo" parameterType="com.hzdl.cms.domain.Article" resultType="com.hzdl.api.vo.ArticleNewVo">
+        <include refid="selectArticleNewVo"/>
+        left join cms_category c on a.category_id = c.category_id
+        left join edg_evidence e on a.evidence_id = e.id
+        left join sys_dept d on d.dept_id = a.dept_id
+        left join cms_tags t on FIND_IN_SET(t.tag_id,a.tag_ids)
+        <where>
+            <if test="title != null and title != ''">and a.title like concat('%', #{title}, '%')</if>
+            <if test="categoryId != null">and a.category_id = #{categoryId}</if>
+            <if test="deptId != null">and a.dept_id = #{deptId}</if>
+            <if test="keywords != null">and a.keywords like concat('%', #{keywords}, '%')</if>
+            <if test="params.evidenceTypes != null "> and e.evidence_type in
+                <foreach item="evidenceType" collection="params.evidenceTypes" open="(" separator="," close=")">
+                    #{evidenceType}
+                </foreach>
+            </if>
+            <if test="params.monthDimension != null and params.monthDimension != ''">and date_format(a.create_time,'%Y-%m') = #{params.monthDimension}</if>
+            <if test="params.dayDimension != null and params.dayDimension != ''">and date_format(a.create_time,'%Y-%m-%d') = #{params.dayDimension}</if>
+            <if test="params.tagId !=null and params.tagId != ''">and tag_id = #{params.tagId}</if>
+            and a.del_flag = 0
+        </where>
+        group by a.article_id
+        order by a.create_time desc
+    </select>
+
+    <!-- 查询文章月统计 -->
+    <select id="countMonths" parameterType="Long" resultType="com.hzdl.api.vo.ArticleCountVo">
+        select count(*) nums, date_format(create_time,'%Y-%m') dimension from cms_article
+        <where>
+            <if test="deptId!=null">dept_id = #{deptId}</if>
+            and del_flag = 0
+        </where>
+        group by dimension order by dimension desc limit 0, 10
+    </select>
+
+    <!-- 查询文章日统计 -->
+    <select id="countDays" resultType="com.hzdl.api.vo.ArticleCountVo">
+        select count(*) nums, date_format(create_time,'%Y-%m-%d') dimension from cms_article
+        <where>
+            <if test="deptId!=null">dept_id = #{deptId}</if>
+            <if test="year!=null">and year(create_time) = #{year}</if>
+            <if test="month!=null">and month(create_time) =#{month}</if>
+            and del_flag = 0          
+        </where>
+        group by dimension order by dimension desc
+    </select>
+
+    <!-- 查询文章栏目统计 -->
+    <select id="countCategory" resultType="com.hzdl.api.vo.ArticleCountVo">
+        select count(*) nums, a.category_id dimensionId, c.category_name dimension
+        from cms_article a
+        left join cms_category c on a.category_id = c.category_id
+        <where>
+            <if test="deptId!=null">a.dept_id = #{deptId}</if>
+            and a.del_flag = 0 and c.del_flag = 0 and c.status = 0
+        </where>
+        group by a.category_id, dimension order by dimension desc
+    </select>
+
+    <!-- 查询文章标签统计 -->
+    <select id="countTags" resultType="com.hzdl.api.vo.ArticleCountVo">
+        select count(*) nums, t.tag_id dimensionId, t.tag_name dimension
+        from cms_article a
+        left join cms_tags t on FIND_IN_SET(t.tag_id,a.tag_ids)
+        <where>
+            <if test="deptId!=null">a.dept_id = #{deptId}</if>
+            and a.del_flag = 0 and t.status = 0
+        </where>
+        group by t.tag_id
+    </select>
+
+    <select id="selectArticleVoById" parameterType="Long" resultMap="ArticleResultVo">
+        <include refid="selectArticleVo"/>
+        left join cms_category c on a.category_id = c.category_id
+        left join sys_dept d on d.dept_id = a.dept_id
+        left join edg_evidence e on e.id = a.evidence_id
+        left join cms_tags t on FIND_IN_SET(t.tag_id,a.tag_ids)
+        where article_id = #{articleId}
+    </select>
+
+    <select id="selectArticleById" parameterType="Long" resultMap="ArticleResult">
+        <include refid="selectArticle"/>
+        where article_id = #{articleId}
+    </select>
+
+    <!-- 查询最新文章详情 -->
+    <select id="selectArticleDetailNewVoById" parameterType="Long" resultType="com.hzdl.api.vo.ArticleDetailNewVo">
+        <include refid="selectArticleDetailNewVo"/>
+        left join cms_category c on a.category_id = c.category_id
+        left join edg_evidence e on a.evidence_id = e.id
+        left join sys_dept d on d.dept_id = a.dept_id
+        left join cms_tags t on FIND_IN_SET(t.tag_id,a.tag_ids)
+        where a.article_id = #{articleId}
+    </select>
+    
+    <!-- 根据机构id统计该机构发布的文章总数 -->
+    <select id = "countGroupByDept" parameterType="Long" resultType="Integer">
+    	select count(1) from cms_article where dept_id = #{deptId}
+    </select>
+
+    <insert id="insertArticle" parameterType="com.hzdl.cms.domain.Article" useGeneratedKeys="true"
+            keyProperty="articleId">
+        insert into cms_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="keywords != null">keywords,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="tagIds != null and tagIds != ''">tag_ids,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="evidenceId != null">evidence_id,</if>
+            <if test="content != null">content,</if>
+            <if test="delFlag != null and delFlag != ''">del_flag,</if>
+            <if test="viewCount != null and viewCount != ''">view_count,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="keywords != null">#{keywords},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="tagIds != null and tagIds != ''">#{tagIds},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="evidenceId != null">#{evidenceId},</if>
+            <if test="content != null">#{content},</if>
+            <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+            <if test="viewCount != null and viewCount != ''">#{viewCount},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateArticle" parameterType="com.hzdl.cms.domain.Article">
+        update cms_article
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="keywords != null">keywords = #{keywords},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="tagIds != null and tagIds != ''">tag_ids = #{tagIds},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="evidenceId != null">evidence_id = #{evidenceId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+            <if test="viewCount != null and viewCount != ''">view_count = #{viewCount},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where article_id = #{articleId}
+    </update>
+
+    <delete id="deleteArticleById" parameterType="Long">
+        update cms_article set del_flag = 1 where article_id = #{articleId}
+    </delete>
+
+    <delete id="deleteArticleByIds" parameterType="String">
+        update cms_article set del_flag = 1 where article_id in
+        <foreach item="articleId" collection="array" open="(" separator="," close=")">
+            #{articleId}
+        </foreach>
+    </delete>
+
+</mapper>

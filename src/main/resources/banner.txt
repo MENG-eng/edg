@@ -1,0 +1,2 @@
+com.hzdl.Application Version: ${hzdl.version}
+Spring Boot Version: ${spring-boot.version}
