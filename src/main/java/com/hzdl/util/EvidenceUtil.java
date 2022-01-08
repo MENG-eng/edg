@@ -23,9 +23,9 @@ import static com.hzdl.constant.EvidenceConstant.fileServer;
  */
 public class EvidenceUtil {
 
-    private static final String SERVER = "10.112.11.224:3000";//ConfigUtil.getConfigByKey("edg.evidence.server");
+    private static final String SERVER = "10.112.56.65:3000";//ConfigUtil.getConfigByKey("edg.evidence.server");
     public static final String KEY_ID_SEPARATOR = "|";
-    private static final String FILE_SERVER = "10.112.11.224:3080"; //ConfigUtil.getConfigByKey("edg.file.server");
+    private static final String FILE_SERVER = "10.112.56.65:3080"; //ConfigUtil.getConfigByKey("edg.file.server");
 
     /**
      * 存证
