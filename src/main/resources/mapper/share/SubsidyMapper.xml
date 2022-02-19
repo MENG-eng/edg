@@ -1,0 +1,48 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzdl.share.mapper.SubsidyMapper">
+
+    <resultMap type="com.hzdl.share.domain.Subsidy" id="SubsidyResult">
+        <result property="subsidyId"    column="subsidy_id"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="description"    column="description"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="shareState"    column="share_state"    />
+        <result property="applyName"    column="apply_name"    />
+        <result property="shareName"    column="share_name"    />
+        <result property="checkName"    column="check_name"    />
+    </resultMap>
+
+    <sql id="selectSubsidyVo">
+        SELECT subsidy_id,file_name, description,create_time,share_state,apply_name,share_name,check_name FROM share_subsidy
+    </sql>
+
+    <select id="selectSubsidyList" parameterType="com.hzdl.share.domain.Subsidy" resultMap="SubsidyResult">
+        <include refid="selectSubsidyVo"/>
+        order by create_time desc
+    </select>
+
+    <insert id="insertSubsidy" parameterType="com.hzdl.share.domain.Subsidy" useGeneratedKeys="true" keyProperty="id">
+        insert into share_subsidy
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fileName != null and fileName != ''">file_name,</if>
+            <if test="description != null">description,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="shareState != null">share_state,</if>
+            <if test="applyName != null">apply_name,</if>
+            <if test="shareName != null">share_name,</if>
+            <if test="checkName != null">check_name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fileName != null and fileName != ''">#{fileName},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="shareState != null">#{shareState},</if>
+            <if test="applyName != null">#{applyName},</if>
+            <if test="shareName != null">#{shareName},</if>
+            <if test="checkName != null">#{checkName},</if>
+        </trim>
+    </insert>
+
+</mapper>
