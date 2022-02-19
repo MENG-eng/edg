@@ -4,7 +4,7 @@
 <mapper namespace="com.hzdl.share.mapper.SubsidyMapper">
 
     <resultMap type="com.hzdl.share.domain.Subsidy" id="SubsidyResult">
-        <result property="subsidyId"    column="subsidy_id"    />
+        <result property="id"    column="id"    />
         <result property="fileName"    column="file_name"    />
         <result property="description"    column="description"    />
         <result property="createTime"    column="create_time"    />
@@ -15,7 +15,7 @@
     </resultMap>
 
     <sql id="selectSubsidyVo">
-        SELECT subsidy_id,file_name, description,create_time,share_state,apply_name,share_name,check_name FROM share_subsidy
+        SELECT id,file_name, description,create_time,share_state,apply_name,share_name,check_name FROM share_subsidy
     </sql>
 
     <select id="selectSubsidyList" parameterType="com.hzdl.share.domain.Subsidy" resultMap="SubsidyResult">

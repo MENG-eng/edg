@@ -16,7 +16,7 @@ public class Subsidy extends BaseEntity {
     /**
      * 补贴id
      */
-    private Long subsidyId;
+    private Long id;
 
     /**
      * 共享文件名称
@@ -62,12 +62,12 @@ public class Subsidy extends BaseEntity {
      */
     private String checkName;
 
-    public Long getSubsidyId() {
-        return subsidyId;
+    public Long getId() {
+        return id;
     }
 
-    public void setSubsidyId(Long subsidyId) {
-        this.subsidyId = subsidyId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFileName() {

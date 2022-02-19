@@ -270,7 +270,7 @@ public class SubsidyServiceImpl implements ISubsidyService {
         evidenceNode.setDeptId(deptId);
         evidenceNode.setDeptName(deptName);
         evidenceNode.setAncestors("0");
-        evidenceNode.setEvidenceId(subsidy.getSubsidyId());
+        evidenceNode.setEvidenceId(subsidy.getId());
         evidenceNode.setOptType(EvidenceConstant.OPT_CREATE);
         evidenceNode.setDescription(subsidy.getDescription());
         evidenceNode.setTotalSize(fileSize);
